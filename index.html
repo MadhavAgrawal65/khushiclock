@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khushi's Prvt clock</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background-color: #f0f0f0;
+        }
+
+        .clock-container {
+            width: 270px;
+            height: 270px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin: 20px;
+        }
+
+        .clock-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .clock {
+            color: var(--clock-color);
+            font-size: 2rem;
+            padding-top: 90px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.5); /* Add text background */
+            color: white; /* Text color */
+            border-radius: 50%;
+        }
+
+        .weather-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .weather-box {
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .weather-box h2 {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .weather-info {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container" id="london-clock">
+        <img src="london.jpeg" alt="London Clock">
+        <div class="clock" id="london-time"></div>
+    </div>
+    <div class="clock-container" id="gwalior-clock">
+        <img src="Gwalior.jpeg" alt="Gwalior Clock">
+        <div class="clock" id="gwalior-time"></div>
+    </div>
+
+    <div class="weather-section">
+        <div class="weather-box" id="london-weather">
+            <h2>London Weather</h2>
+            <div class="weather-info">
+                <p id="london-temperature">Temperature: </p>
+                <p id="london-feels-like">Feels Like: </p>
+                <p id="london-humidity">Humidity: </p>
+            </div>
+        </div>
+        <div class="weather-box" id="gwalior-weather">
+            <h2>Gwalior Weather</h2>
+            <div class="weather-info">
+                <p id="gwalior-temperature">Temperature: </p>
+                <p id="gwalior-feels-like">Feels Like: </p>
+                <p id="gwalior-humidity">Humidity: </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function updateTime() {
+            const londonTime = new Date().toLocaleString('en-US', {
+                timeZone: 'Europe/London',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: false
+            });
+
+            document.getElementById('london-time').textContent = londonTime;
+
+            const gwaliorTime = new Date().toLocaleString('en-US', {
+                timeZone: 'Asia/Kolkata',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: false
+            });
+
+            document.getElementById('gwalior-time').textContent = gwaliorTime;
+        }
+
+        async function fetchWeather(city) {
+            const url = `https://weather-by-api-ninjas.p.rapidapi.com/v1/weather?city=${city}`;
+            const options = {
+                method: 'GET',
+                headers: {
+                    'X-RapidAPI-Key': '70aa2b8498msha9dba139d28d50fp1094d6jsnca468183acee',
+                    'X-RapidAPI-Host': 'weather-by-api-ninjas.p.rapidapi.com'
+                }
+            };
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching weather:', error);
+            }
+        }
+
+        async function setWeatherInfo() {
+            const londonWeatherData = await fetchWeather('London');
+            const gwaliorWeatherData = await fetchWeather('Gwalior');
+
+            document.getElementById('london-temperature').textContent = `Temperature: ${londonWeatherData.temperature}°C`;
+            document.getElementById('london-feels-like').textContent = `Feels Like: ${londonWeatherData.feelsLike}°C`;
+            document.getElementById('london-humidity').textContent = `Humidity: ${londonWeatherData.humidity}%`;
+
+            document.getElementById('gwalior-temperature').textContent = `Temperature: ${gwaliorWeatherData.temperature}°C`;
+            document.getElementById('gwalior-feels-like').textContent = `Feels Like: ${gwaliorWeatherData.feelsLike}°C`;
+            document.getElementById('gwalior-humidity').textContent = `Humidity: ${gwaliorWeatherData.humidity}%`;
+        }
+
+        function initClocksAndWeather() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            setWeatherInfo();
+        }
+
+        initClocksAndWeather();
+    </script>
+</body>
+</html>
